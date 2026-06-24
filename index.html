@@ -65,7 +65,7 @@
             const description = document.getElementById('prompt').value;
 
             alert('Fetch disparado');
-            fetch('https://aryys-music.anyclaw.store/api/generate', {
+            fetch('/api/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ style, description })
