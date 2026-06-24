@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aryys Music - Gerador de Música</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); min-height: 100vh; }
+        .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        .glow { box-shadow: 0 0 30px rgba(139, 92, 246, 0.3); }
+    </style>
+</head>
+<body class="text-white">
+    <div class="max-w-2xl mx-auto px-4 py-12">
+        <div class="text-center mb-12">
+            <div class="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-3xl glow">♪</div>
+            <h1 class="text-4xl font-bold mb-2">Aryys Music</h1>
+            <p class="text-gray-400 text-lg">Gere músicas únicas com IA</p>
+        </div>
+
+        <div class="glass rounded-2xl p-8 glow">
+            <form id="musicForm" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Estilo Musical</label>
+                    <select id="estilo" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/10 text-white focus:outline-none focus:border-purple-500 transition">
+                        <option value="Pop">Pop</option>
+                        <option value="Rock">Rock</option>
+                        <option value="Eletrônica">Eletrônica</option>
+                        <option value="Lo-fi">Lo-fi</option>
+                        <option value="Clássica">Clássica</option>
+                        <option value="Jazz">Jazz</option>
+                        <option value="Hip Hop">Hip Hop</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Descrição</label>
+                    <textarea id="prompt" rows="3" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/10 text-white focus:outline-none focus:border-purple-500 transition placeholder-gray-500" placeholder="Descreva a música que deseja gerar..."></textarea>
+                </div>
+                <div>
+                    <label for="audioUpload" class="block text-sm font-medium text-gray-300 mb-2">Carregar voz de referência:</label>
+                    <input type="file" id="audioUpload" accept="audio/*" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/10 text-white file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-500 focus:outline-none focus:border-purple-500 transition">
+                </div>
+                <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 font-semibold text-lg hover:from-purple-500 hover:to-pink-500 transition-all glow">
+                    Gerar Música
+                </button>
+            </form>
+            <div id="result" class="mt-6 hidden">
+                <div class="p-4 rounded-xl bg-white/5 border border-white/10">
+                    <p class="text-gray-300" id="resultMessage"></p>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-center text-gray-500 text-sm mt-8">© 2026 Aryys Music. Todos os direitos reservados.</p>
+    </div>
+
+    <script>
+        document.getElementById('musicForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.textContent = 'Gerando...';
+            btn.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('estilo', document.getElementById('estilo').value);
+                formData.append('prompt_texto', document.getElementById('prompt').value);
+                const audioInput = document.getElementById('audioUpload');
+                if (audioInput.files[0]) {
+                    formData.append('audio', audioInput.files[0]);
+                }
+
+                const res = await fetch('/api/gerar-musica', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                const result = document.getElementById('result');
+                result.classList.remove('hidden');
+                document.getElementById('resultMessage').textContent = data.mensagem;
+            } catch (err) {
+                alert('Erro ao gerar música. Tente novamente.');
+            } finally {
+                btn.textContent = 'Gerar Música';
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
